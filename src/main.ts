@@ -1,16 +1,13 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core'
+import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import winstonLogger from './config/winston.config'
-import { HttpExceptionFilter } from './filters/http-exception.filter'
+import { Logger } from 'nestjs-pino'
 import { AllExceptionFilter } from './filters/all-exception.filter'
-
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, {
-		logger: winstonLogger
-	})
+	const app = await NestFactory.create(AppModule, { bufferLogs: true })
 
 	app.setGlobalPrefix('api/v1')
-	app.useGlobalFilters(new AllExceptionFilter(winstonLogger))
+	app.useLogger(app.get(Logger))
+	app.useGlobalFilters(new AllExceptionFilter())
 	await app.listen(process.env.PORT ?? 3000)
 }
 bootstrap()

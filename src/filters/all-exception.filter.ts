@@ -1,18 +1,18 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, LoggerService } from '@nestjs/common'
-import { HttpAdapterHost } from '@nestjs/core'
-
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-	constructor(private logger: LoggerService) {}
+	constructor() {}
 	catch(exception: HttpException, host: ArgumentsHost): any {
 		const ctx = host.switchToHttp()
 		// const {httpAdapter}  = this.httpAdapterHost
 		//响应请求对象
+
 		const response = ctx.getResponse()
+
 		const request = ctx.getRequest()
 		//http状态码
 		const code = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
-		this.logger.error(exception.message, exception.stack)
+		// this.logger.error(exception.message, exception.stack)
 		const responseBody = {
 			code,
 
@@ -26,8 +26,9 @@ export class AllExceptionFilter implements ExceptionFilter {
 			exception: exception.name,
 			error: exception['response'] || 'SERVER ERROR'
 		}
-		this.logger.error('[toimc]', { ...responseBody, headers: request.headers })
+		// this.logger.error('[toimc]', { ...responseBody, headers: request.headers })
 		// httpAdapter.reply(response,responseBody,code)
+
 		response.status(code).json(responseBody)
 	}
 }

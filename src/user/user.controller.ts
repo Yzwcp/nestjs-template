@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { UserService } from './user.service'
 import { ConfigService } from '@nestjs/config'
-
+import { Logger } from 'nestjs-pino'
+import { UserListQuery } from './dto/get-user.dto'
 @Controller('user')
 export class UserController {
 	constructor(
@@ -9,10 +10,16 @@ export class UserController {
 		private readonly configService: ConfigService,
 		private readonly logger: Logger
 	) {}
+	@Get('/findAll')
+	findAll(@Query() query: UserListQuery) {
+		return this.userService.findAll(query)
+	}
 
-	@Get('/:id')
-	findOne(@Param('id') id: string) {
-		return this.userService.findOne(Number(id))
+	@Get('/getOne/:id')
+	async findOne(@Param('id') id: string) {
+		const data = await this.userService.findOne(Number(id))
+		console.log(data)
+		return data
 	}
 
 	@Post('/create')
